@@ -4,12 +4,17 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
-import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.transactions.transaction
 import ru.gadjetzona.database.tokens.TokenDTO
 import ru.gadjetzona.database.tokens.Tokens
 import ru.gadjetzona.database.users.UserDTO
 import ru.gadjetzona.database.users.Users
+import ru.gadjetzona.database.basket.BasketDTO
+import ru.gadjetzona.database.baskets.Basket
+import ru.gadjetzona.database.likes.Likes
+import ru.gadjetzona.database.likes.LikesDTO
+import ru.gadjetzona.database.orders.Orders
+import ru.gadjetzona.database.orders.OrdersDTO
 import ru.gadjetzona.utils.isValidEmail
 import java.util.*
 
@@ -34,8 +39,8 @@ class RegisterController(val call: ApplicationCall) {
                     throw IllegalArgumentException("User with this email already exists")
                 }
 
-                // Вставка нового пользователя
-                Users.insert(
+                // Вставка нового пользователя и получение его ID
+                val userId = Users.insertAndGetId(
                     UserDTO(
                         email = registerReceiveRemote.email,
                         password = registerReceiveRemote.password,
@@ -44,12 +49,38 @@ class RegisterController(val call: ApplicationCall) {
                     )
                 )
 
+                // Вставка связанных записей
+                Basket.insertAndGetId(
+                    BasketDTO(
+                        userId = userId,
+                        itemId = null,
+                        amount = null
+                    )
+                )
+                Likes.insertAndGetId(
+                    LikesDTO(
+                        userId = userId,
+                        itemId = null,
+                        amount = null
+                    )
+                )
+                Orders.insertAndGetId(
+                    OrdersDTO(
+                        userId = userId,
+                        orderNum = null,
+                        itemId = null,
+                        dateOrder = null,
+                        addressOrder = null,
+                        numberPhoneOrder = null
+                    )
+                )
+
                 // Вставка токена
-                Tokens.insert(
+                Tokens.insertToken(
                     TokenDTO(
-                        id = UUID.randomUUID().toString(),
-                        email = registerReceiveRemote.email,
-                        token = token
+                        id_token = UUID.randomUUID().toString(),
+                        email_token = registerReceiveRemote.email,
+                        tokens = token
                     )
                 )
             }

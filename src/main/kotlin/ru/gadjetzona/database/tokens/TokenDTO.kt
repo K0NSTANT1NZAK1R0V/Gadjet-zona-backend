@@ -1,7 +1,7 @@
 package ru.gadjetzona.database.tokens
 
 class TokenDTO (
-    val id: String,
-    val email: String,
-    val token: String
+    val id_token: String,
+    val email_token: String,
+    val tokens: String
 )
