@@ -1,8 +1,8 @@
 package ru.gadjetzona.database.orders
 
-import java.sql.Date
-import java.time.LocalDateTime
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class OrdersDTO(
     val idOrder: Int? = null,
     val orderNum: Int? = null,

@@ -10,13 +10,13 @@ import ru.gadjetzona.database.users.Users
 
 
 object Orders : Table("orders") {
-    val idOrder = integer("orderId").autoIncrement()
-    val orderNum = integer("orderNum").nullable()
-    val userIdOrders = integer("userId").references(Users.id)
-    val itemId_orders = integer("itemId").references(Item.itemId).nullable()
-    val dateOrder = varchar("date", 8).nullable()
+    val idOrder = integer("orderid").autoIncrement()
+    val orderNum = integer("ordernum").nullable()
+    val userIdOrders = integer("userid").references(Users.id)
+    val itemId_orders = integer("itemid").references(Item.itemId).nullable()
+    val dateOrder = varchar("date", 16).nullable()
     val addressOrder = varchar("address", 255).nullable()
-    val numberPhoneOrder = varchar("phNum", 11).nullable()
+    val numberPhoneOrder = varchar("phnum", 11).nullable()
 
     override val primaryKey = PrimaryKey(idOrder, name = "PK_Order_ID")
 
