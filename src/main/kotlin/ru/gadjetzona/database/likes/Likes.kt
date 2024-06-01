@@ -9,9 +9,9 @@ import ru.gadjetzona.database.item.Item
 import ru.gadjetzona.database.users.Users
 
 object Likes : Table("likes") {
-    val likesId = integer("likesId").autoIncrement()
-    val userIdLikes = integer("userId").references(Users.id)
-    val itemId = integer("itemId").references(Item.itemId).nullable()
+    val likesId = integer("likesid").autoIncrement()
+    val userIdLikes = integer("userid").references(Users.id)
+    val itemId = integer("itemid").references(Item.itemId).nullable()
     val amount = integer("amount").nullable()
 
     override val primaryKey = PrimaryKey(likesId, name = "PK_LIKES_ID")

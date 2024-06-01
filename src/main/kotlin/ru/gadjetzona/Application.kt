@@ -5,6 +5,7 @@ import io.ktor.server.cio.*
 import io.ktor.server.engine.*
 import org.jetbrains.exposed.sql.Database
 import ru.gadjetzona.features.addtobasket.configureBasketRouting
+import ru.gadjetzona.features.addtolikes.configureLikesRouting
 import ru.gadjetzona.features.login.configureLoginRouting
 import ru.gadjetzona.plugins.*
 import ru.gadjetzona.features.register.configureRegisterRouting
@@ -19,6 +20,7 @@ fun main() {
 fun Application.module() {
     configureRouting()
     configureLoginRouting()
+    configureLikesRouting()
     configureBasketRouting()
     configureRegisterRouting()
     configureSerialization()
