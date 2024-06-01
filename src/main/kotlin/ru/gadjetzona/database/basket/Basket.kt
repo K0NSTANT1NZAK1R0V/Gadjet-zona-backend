@@ -4,12 +4,13 @@ import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
 import ru.gadjetzona.database.basket.BasketDTO
+import ru.gadjetzona.database.item.Item
 import ru.gadjetzona.database.users.Users
 
 object Basket : Table("basket") {
-    val basketId = integer("basketId").autoIncrement()
-    val userIdBasket = integer("userId").references(Users.id)
-    val itemIdBasket = integer("itemId").nullable()
+    val basketId = integer("basketid").autoIncrement()
+    val userIdBasket = integer("userid").references(Users.id)
+    val itemIdBasket = integer("itemid").references(Item.itemId).nullable()
     val amount = integer("amount").nullable()
 
     override val primaryKey = PrimaryKey(basketId, name = "PK_BASKET_ID")
