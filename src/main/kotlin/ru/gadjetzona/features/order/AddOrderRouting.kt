@@ -25,7 +25,7 @@ fun Application.configureOrderRouting() {
                     return@get
                 }
                 val controller = OrderController(call)
-                controller.getUserOrders(userId)
+                controller.getUserOrderItems(userId)
             }
         }
     }

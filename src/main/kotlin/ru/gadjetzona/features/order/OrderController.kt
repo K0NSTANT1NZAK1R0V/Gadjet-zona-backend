@@ -12,6 +12,9 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import ru.gadjetzona.database.orders.OrdersDTO
 import ru.gadjetzona.database.orders.Orders
 import org.slf4j.LoggerFactory
+import ru.gadjetzona.database.image.Image
+import ru.gadjetzona.database.item.Item
+import ru.gadjetzona.database.orders.OrdersItemDTO
 
 class OrderController(private val call: ApplicationCall) {
     private val logger = LoggerFactory.getLogger(OrderController::class.java)
@@ -40,6 +43,7 @@ class OrderController(private val call: ApplicationCall) {
                     it[orderNum] = orderReceiveRemote.orderNum
                     it[userIdOrders] = orderReceiveRemote.userId
                     it[itemId_orders] = orderReceiveRemote.itemId
+                    it[amount] = orderReceiveRemote.amount
                     it[dateOrder] = orderReceiveRemote.dateOrder
                     it[addressOrder] = orderReceiveRemote.addressOrder
                     it[numberPhoneOrder] = orderReceiveRemote.numberPhoneOrder
@@ -83,26 +87,44 @@ class OrderController(private val call: ApplicationCall) {
         }
     }
 
-    suspend fun getUserOrders(userId: Int) {
+    suspend fun getUserOrderItems(userId: Int) {
         try {
-            val userOrders = transaction {
-                Orders.select { Orders.userIdOrders eq userId }
+            val orderItems = transaction {
+                (Orders innerJoin Item innerJoin Image)
+                    .slice(
+                        Orders.idOrder,
+                        Orders.orderNum,
+                        Orders.userIdOrders,
+                        Item.itemId,
+                        Item.name,
+                        Item.price,
+                        Orders.amount,
+                        Image.dataImage,
+                        Orders.dateOrder,
+                        Orders.addressOrder,
+                        Orders.numberPhoneOrder
+                    )
+                    .select { Orders.userIdOrders eq userId }
                     .map {
-                        OrdersDTO(
+                        OrdersItemDTO(
                             idOrder = it[Orders.idOrder],
-                            orderNum = it[Orders.orderNum],
+                            orderNum = it[Orders.orderNum], // Added null check
                             userId = it[Orders.userIdOrders],
-                            itemId = it[Orders.itemId_orders],
-                            dateOrder = it[Orders.dateOrder],
-                            addressOrder = it[Orders.addressOrder],
-                            numberPhoneOrder = it[Orders.numberPhoneOrder]
+                            itemId = it[Item.itemId],
+                            itemName = it[Item.name],
+                            price = it[Item.price],
+                            amount = it[Orders.amount] ?: 1,
+                            imageData = it[Image.dataImage],
+                            dateOrder = it[Orders.dateOrder].toString(),
+                            addressOrder = it[Orders.addressOrder] ?: "",
+                            numberPhoneOrder = it[Orders.numberPhoneOrder] ?: ""
                         )
                     }
             }
-            call.respond(userOrders)
+            call.respond(orderItems)
         } catch (e: Exception) {
-            logger.error("Failed to fetch user orders", e)
-            call.respond(HttpStatusCode.InternalServerError, "Failed to fetch user orders: ${e.localizedMessage}")
+            logger.error("Failed to fetch user order items", e)
+            call.respond(HttpStatusCode.InternalServerError, "Failed to fetch user order items: ${e.localizedMessage}")
         }
     }
 }

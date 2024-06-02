@@ -67,9 +67,10 @@ class RegisterController(val call: ApplicationCall) {
                 Orders.insertAndGetId(
                     OrdersDTO(
                         userId = userId,
-                        orderNum = null,
+                        orderNum = userId,
                         itemId = null,
                         dateOrder = null,
+                        amount = null,
                         addressOrder = null,
                         numberPhoneOrder = null
                     )
