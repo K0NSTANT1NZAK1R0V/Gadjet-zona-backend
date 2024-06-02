@@ -6,6 +6,7 @@ import io.ktor.server.engine.*
 import org.jetbrains.exposed.sql.Database
 import ru.gadjetzona.features.basket.configureBasketRouting
 import ru.gadjetzona.features.catalog.configureCatalogRouting
+import ru.gadjetzona.features.itemcard.configureItemCardRouting
 import ru.gadjetzona.features.likes.configureLikesRouting
 import ru.gadjetzona.features.login.configureLoginRouting
 import ru.gadjetzona.features.orders.configureOrderRouting
@@ -28,6 +29,7 @@ fun Application.module() {
     configureCatalogRouting()
     configureOrderRouting()
     configureItemRouting()
+    configureItemCardRouting()
     configureRegisterRouting()
     configureSerialization()
 }
