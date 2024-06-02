@@ -2,6 +2,7 @@ package ru.gadjetzona.features.catalog
 
 import io.ktor.server.application.*
 import io.ktor.server.response.*
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
@@ -41,6 +42,36 @@ class CatalogController(private val call: ApplicationCall) {
                 }
         }
 
+        call.respond(catalogItems)
+    }
+
+    suspend fun getCatalogItemsByCategory(typeId: Int) {
+        val catalogItems = transaction {
+            (Item innerJoin Types innerJoin Image)
+                .slice(
+                    Item.itemId,
+                    Types.nameTypes,
+                    Item.name,
+                    Item.price,
+                    Item.descrip,
+                    Item.rating,
+                    Image.nameImage,
+                    Image.dataImage
+                )
+                .select { Item.typeId eq typeId }
+                .map {
+                    CatalogItemDTO(
+                        itemId = it[Item.itemId],
+                        typeName = it[Types.nameTypes],
+                        name = it[Item.name],
+                        price = it[Item.price],
+                        description = it[Item.descrip],
+                        rating = it[Item.rating],
+                        imageName = it[Image.nameImage],
+                        imageData = it[Image.dataImage]
+                    )
+                }
+        }
         call.respond(catalogItems)
     }
 }
