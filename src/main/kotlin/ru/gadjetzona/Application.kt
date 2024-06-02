@@ -4,11 +4,11 @@ import io.ktor.server.application.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
 import org.jetbrains.exposed.sql.Database
-import ru.gadjetzona.features.order.configureOrderRouting
 import ru.gadjetzona.features.basket.configureBasketRouting
 import ru.gadjetzona.features.catalog.configureCatalogRouting
 import ru.gadjetzona.features.likes.configureLikesRouting
 import ru.gadjetzona.features.login.configureLoginRouting
+import ru.gadjetzona.features.orders.configureOrderRouting
 import ru.gadjetzona.plugins.*
 import ru.gadjetzona.features.register.configureRegisterRouting
 
