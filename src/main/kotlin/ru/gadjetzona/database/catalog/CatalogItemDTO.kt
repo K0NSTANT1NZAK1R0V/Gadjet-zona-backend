@@ -1,4 +1,4 @@
-package ru.gadjetzona.database
+package ru.gadjetzona.database.catalog
 
 import kotlinx.serialization.Serializable
 
@@ -8,8 +8,6 @@ data class CatalogItemDTO(
     val typeName: String,
     val name: String,
     val price: Double,
-    val description: String,
     val rating: Double,
-    val imageName: String,
     val imageData: Int
 )

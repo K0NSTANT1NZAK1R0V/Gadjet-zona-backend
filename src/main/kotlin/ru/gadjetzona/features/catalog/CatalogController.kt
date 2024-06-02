@@ -6,7 +6,7 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
-import ru.gadjetzona.database.CatalogItemDTO
+import ru.gadjetzona.database.catalog.CatalogItemDTO
 import ru.gadjetzona.database.image.Image
 import ru.gadjetzona.database.item.Item
 import ru.gadjetzona.database.types.Types
@@ -22,9 +22,7 @@ class CatalogController(private val call: ApplicationCall) {
                     Types.nameTypes,
                     Item.name,
                     Item.price,
-                    Item.descrip,
                     Item.rating,
-                    Image.nameImage,
                     Image.dataImage
                 )
                 .selectAll()
@@ -34,9 +32,7 @@ class CatalogController(private val call: ApplicationCall) {
                         typeName = it[Types.nameTypes],
                         name = it[Item.name],
                         price = it[Item.price],
-                        description = it[Item.descrip],
                         rating = it[Item.rating],
-                        imageName = it[Image.nameImage],
                         imageData = it[Image.dataImage]
                     )
                 }
@@ -53,9 +49,7 @@ class CatalogController(private val call: ApplicationCall) {
                     Types.nameTypes,
                     Item.name,
                     Item.price,
-                    Item.descrip,
                     Item.rating,
-                    Image.nameImage,
                     Image.dataImage
                 )
                 .select { Item.typeId eq typeId }
@@ -65,9 +59,7 @@ class CatalogController(private val call: ApplicationCall) {
                         typeName = it[Types.nameTypes],
                         name = it[Item.name],
                         price = it[Item.price],
-                        description = it[Item.descrip],
                         rating = it[Item.rating],
-                        imageName = it[Image.nameImage],
                         imageData = it[Image.dataImage]
                     )
                 }

@@ -10,9 +10,12 @@ import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.slf4j.LoggerFactory
 import ru.gadjetzona.database.basket.BasketDTO
 import ru.gadjetzona.database.baskets.Basket
-import org.slf4j.LoggerFactory
+import ru.gadjetzona.database.basket.BasketItemDTO
+import ru.gadjetzona.database.image.Image
+import ru.gadjetzona.database.item.Item
 
 class BasketController(private val call: ApplicationCall) {
     private val logger = LoggerFactory.getLogger(BasketController::class.java)
@@ -81,16 +84,26 @@ class BasketController(private val call: ApplicationCall) {
             call.respond(HttpStatusCode.BadRequest, "Failed to remove item from basket: ${e.localizedMessage}")
         }
     }
+
     suspend fun getUserBasketItems(userId: Int) {
         try {
             val basketItems = transaction {
-                Basket.select { Basket.userIdBasket eq userId }
+                (Basket innerJoin Item innerJoin Image)
+                    .slice(
+                        Item.itemId,
+                        Item.name,
+                        Item.price,
+                        Basket.amount,
+                        Image.dataImage
+                    )
+                    .select { Basket.userIdBasket eq userId }
                     .map {
-                        BasketDTO(
-                            basketId = it[Basket.basketId],
-                            userId = it[Basket.userIdBasket],
-                            itemId = it[Basket.itemIdBasket],
-                            amount = it[Basket.amount]
+                        BasketItemDTO(
+                            itemId = it[Item.itemId],
+                            itemName = it[Item.name],
+                            price = it[Item.price],
+                            quantity = it[Basket.amount] ?: 1,
+                            imageData = it[Image.dataImage]
                         )
                     }
             }
