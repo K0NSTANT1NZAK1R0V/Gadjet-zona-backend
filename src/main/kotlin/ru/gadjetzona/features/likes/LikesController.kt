@@ -8,6 +8,7 @@ import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
 import ru.gadjetzona.database.likes.Likes
@@ -79,6 +80,26 @@ class LikesController(private val call: ApplicationCall) {
         } catch (e: Exception) {
             logger.error("Failed to remove item from likes: ${e.localizedMessage}")
             call.respond(HttpStatusCode.BadRequest, "Failed to remove item from likes: ${e.localizedMessage}")
+        }
+    }
+
+    suspend fun getUserLikes(userId: Int) {
+        try {
+            val likedItems = transaction {
+                Likes.select { Likes.userIdLikes eq userId }
+                    .map {
+                        LikesDTO(
+                            likesId = it[Likes.likesId],
+                            userId = it[Likes.userIdLikes],
+                            itemId = it[Likes.itemId],
+                            amount = it[Likes.amount]
+                        )
+                    }
+            }
+            call.respond(likedItems)
+        } catch (e: Exception) {
+            logger.error("Failed to fetch user liked items", e)
+            call.respond(HttpStatusCode.InternalServerError, "Failed to fetch user liked items: ${e.localizedMessage}")
         }
     }
 }
