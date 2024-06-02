@@ -11,8 +11,11 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
+import ru.gadjetzona.database.image.Image
+import ru.gadjetzona.database.item.Item
 import ru.gadjetzona.database.likes.Likes
 import ru.gadjetzona.database.likes.LikesDTO
+import ru.gadjetzona.database.likes.LikesItemDTO
 
 
 class LikesController(private val call: ApplicationCall) {
@@ -85,21 +88,30 @@ class LikesController(private val call: ApplicationCall) {
 
     suspend fun getUserLikes(userId: Int) {
         try {
-            val likedItems = transaction {
-                Likes.select { Likes.userIdLikes eq userId }
+            val likesItems = transaction {
+                (Likes innerJoin Item innerJoin Image)
+                    .slice(
+                        Item.itemId,
+                        Item.name,
+                        Item.price,
+                        Item.rating,
+                        Image.dataImage
+                    )
+                    .select { Likes.userIdLikes eq userId }
                     .map {
-                        LikesDTO(
-                            likesId = it[Likes.likesId],
-                            userId = it[Likes.userIdLikes],
-                            itemId = it[Likes.itemId],
-                            amount = it[Likes.amount]
+                        LikesItemDTO(
+                            itemId = it[Item.itemId],
+                            itemName = it[Item.name],
+                            price = it[Item.price],
+                            rating = it[Item.rating],
+                            imageData = it[Image.dataImage]
                         )
                     }
             }
-            call.respond(likedItems)
+            call.respond(likesItems)
         } catch (e: Exception) {
-            logger.error("Failed to fetch user liked items", e)
-            call.respond(HttpStatusCode.InternalServerError, "Failed to fetch user liked items: ${e.localizedMessage}")
+            logger.error("Failed to fetch user likes items", e)
+            call.respond(HttpStatusCode.InternalServerError, "Failed to fetch user likes items: ${e.localizedMessage}")
         }
     }
 }
