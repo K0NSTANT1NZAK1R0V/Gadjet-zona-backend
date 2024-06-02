@@ -8,6 +8,7 @@ import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import ru.gadjetzona.database.basket.BasketDTO
 import ru.gadjetzona.database.baskets.Basket
@@ -78,6 +79,25 @@ class BasketController(private val call: ApplicationCall) {
         } catch (e: Exception) {
             logger.error("Failed to remove item from basket: ${e.localizedMessage}")
             call.respond(HttpStatusCode.BadRequest, "Failed to remove item from basket: ${e.localizedMessage}")
+        }
+    }
+    suspend fun getUserBasketItems(userId: Int) {
+        try {
+            val basketItems = transaction {
+                Basket.select { Basket.userIdBasket eq userId }
+                    .map {
+                        BasketDTO(
+                            basketId = it[Basket.basketId],
+                            userId = it[Basket.userIdBasket],
+                            itemId = it[Basket.itemIdBasket],
+                            amount = it[Basket.amount]
+                        )
+                    }
+            }
+            call.respond(basketItems)
+        } catch (e: Exception) {
+            logger.error("Failed to fetch user basket items", e)
+            call.respond(HttpStatusCode.InternalServerError, "Failed to fetch user basket items: ${e.localizedMessage}")
         }
     }
 }
