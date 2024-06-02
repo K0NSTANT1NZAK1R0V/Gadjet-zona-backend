@@ -1,8 +1,7 @@
-package ru.gadjetzona.features.addtolikes
+package ru.gadjetzona.features.likes
 
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
-import ru.gadjetzona.features.addtobasket.BasketController
 
 fun Application.configureLikesRouting() {
     routing {

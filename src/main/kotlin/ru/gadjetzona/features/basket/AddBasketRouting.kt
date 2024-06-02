@@ -1,4 +1,4 @@
-package ru.gadjetzona.features.addtobasket
+package ru.gadjetzona.features.basket
 
 import io.ktor.server.application.*
 import io.ktor.server.routing.*

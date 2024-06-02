@@ -1,24 +1,22 @@
-package ru.gadjetzona.features.addtolikes
+package ru.gadjetzona.features.basket
 
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import kotlinx.serialization.json.Json
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
+import ru.gadjetzona.database.basket.BasketDTO
+import ru.gadjetzona.database.baskets.Basket
 import org.slf4j.LoggerFactory
-import ru.gadjetzona.database.likes.Likes
-import ru.gadjetzona.database.likes.LikesDTO
 
+class BasketController(private val call: ApplicationCall) {
+    private val logger = LoggerFactory.getLogger(BasketController::class.java)
 
-class LikesController(private val call: ApplicationCall) {
-    private val logger = LoggerFactory.getLogger(LikesController::class.java)
-
-    suspend fun addItemToLikes() {
+    suspend fun addItemToBasket() {
         val requestBody = try {
             call.receiveText()
         } catch (e: Exception) {
@@ -27,8 +25,8 @@ class LikesController(private val call: ApplicationCall) {
             return
         }
 
-        val likesReceiveRemote = try {
-            Json.decodeFromString<LikesDTO>(requestBody)
+        val basketReceiveRemote = try {
+            Json.decodeFromString<BasketDTO>(requestBody)
         } catch (e: Exception) {
             logger.error("Failed to parse request: ${e.localizedMessage}")
             logger.error("Request body: $requestBody")
@@ -38,20 +36,20 @@ class LikesController(private val call: ApplicationCall) {
 
         try {
             transaction {
-                Likes.insert {
-                    it[userIdLikes] = likesReceiveRemote.userId
-                    it[itemId] = likesReceiveRemote.itemId ?: error("Item ID is required")
-                    it[amount] = likesReceiveRemote.amount ?: 1
+                Basket.insert {
+                    it[userIdBasket] = basketReceiveRemote.userId
+                    it[itemIdBasket] = basketReceiveRemote.itemId ?: error("Item ID is required")
+                    it[amount] = basketReceiveRemote.amount ?: 1
                 }
             }
-            call.respond(HttpStatusCode.OK, "Item added to likes successfully")
+            call.respond(HttpStatusCode.OK, "Item added to basket successfully")
         } catch (e: Exception) {
             logger.error("Failed to add item to basket: ${e.localizedMessage}")
-            call.respond(HttpStatusCode.BadRequest, "Failed to add item to likes: ${e.localizedMessage}")
+            call.respond(HttpStatusCode.BadRequest, "Failed to add item to basket: ${e.localizedMessage}")
         }
     }
 
-    suspend fun removeItemFromLikes() {
+    suspend fun removeItemFromBasket() {
         val requestBody = try {
             call.receiveText()
         } catch (e: Exception) {
@@ -60,8 +58,8 @@ class LikesController(private val call: ApplicationCall) {
             return
         }
 
-        val likesReceiveRemote = try {
-            Json.decodeFromString<LikesDTO>(requestBody)
+        val basketReceiveRemote = try {
+            Json.decodeFromString<BasketDTO>(requestBody)
         } catch (e: Exception) {
             logger.error("Failed to parse request: ${e.localizedMessage}")
             logger.error("Request body: $requestBody")
@@ -71,15 +69,15 @@ class LikesController(private val call: ApplicationCall) {
 
         try {
             transaction {
-                Likes.deleteWhere {
-                    (Likes.userIdLikes eq likesReceiveRemote.userId) and
-                            (Likes.itemId eq (likesReceiveRemote.itemId ?: error("Item ID is required")))
+                Basket.deleteWhere {
+                    (Basket.userIdBasket eq basketReceiveRemote.userId) and
+                            (Basket.itemIdBasket eq (basketReceiveRemote.itemId ?: error("Item ID is required")))
                 }
             }
-            call.respond(HttpStatusCode.OK, "Item removed from likes successfully")
+            call.respond(HttpStatusCode.OK, "Item removed from basket successfully")
         } catch (e: Exception) {
-            logger.error("Failed to remove item from likes: ${e.localizedMessage}")
-            call.respond(HttpStatusCode.BadRequest, "Failed to remove item from likes: ${e.localizedMessage}")
+            logger.error("Failed to remove item from basket: ${e.localizedMessage}")
+            call.respond(HttpStatusCode.BadRequest, "Failed to remove item from basket: ${e.localizedMessage}")
         }
     }
 }
