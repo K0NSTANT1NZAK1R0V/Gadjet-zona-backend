@@ -11,6 +11,7 @@ import ru.gadjetzona.features.login.configureLoginRouting
 import ru.gadjetzona.features.orders.configureOrderRouting
 import ru.gadjetzona.plugins.*
 import ru.gadjetzona.features.register.configureRegisterRouting
+import ru.gadjetzona.features.search.configureItemRouting
 
 fun main() {
     Database.connect("jdbc:postgresql://localhost:5432/gadjetzone", driver = "org.postgresql.Driver", user = "postgres",  password = "1234567890")
@@ -26,6 +27,7 @@ fun Application.module() {
     configureBasketRouting()
     configureCatalogRouting()
     configureOrderRouting()
+    configureItemRouting()
     configureRegisterRouting()
     configureSerialization()
 }
